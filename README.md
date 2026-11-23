@@ -1,6 +1,6 @@
-# MEP Engineering & Trading Company - Cheque & Voucher Printer (Version 2.0)
+# IRSCL - Cheque & Voucher Printer (Version 2.0)
 
-A modern, high-precision cheque and voucher printing system built specifically for **MEP Engineering & Trading Company (Pvt) Ltd** (Zoho Books Organization ID: `940082326`).
+A modern, high-precision cheque and voucher printing system built specifically for **IRSCL** (Zoho Books Organization ID: `851035268`).
 
 ---
 

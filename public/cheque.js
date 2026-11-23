@@ -187,7 +187,7 @@ function updateLiveCheque() {
 
   // Company Header
   const showCompany = document.getElementById('chkCompany')?.checked ?? true;
-  const companyText = document.getElementById('cqCompanyInput')?.value || 'MEP Engineering & Trading Company (Pvt) Ltd';
+  const companyText = document.getElementById('cqCompanyInput')?.value || 'IRSCL';
   const companyEl = document.getElementById('cqCompanyHeader');
   if (companyEl) {
     companyEl.style.display = showCompany ? 'block' : 'none';
@@ -195,12 +195,31 @@ function updateLiveCheque() {
   }
 
   // Counterfoil / Stub
-  const showStub = document.getElementById('chkStub')?.checked ?? false;
-  const stubEl = document.getElementById('chequeStub');
+  const showStub = document.getElementById('chkCounterfoil')?.checked || document.getElementById('chkStub')?.checked || false;
+  const stubEl = document.getElementById('counterfoilPaper') || document.getElementById('chequeStub');
   if (stubEl) stubEl.style.display = showStub ? 'flex' : 'none';
 
+  const rawDate = document.getElementById('cqDateInput')?.value;
+  let cfDateStr = '—';
+  if (rawDate && rawDate.includes('-')) {
+    const dp = rawDate.split('-');
+    if (dp.length === 3) cfDateStr = `${dp[2]}/${dp[1]}/${dp[0]}`;
+  } else if (d && d.d1) {
+    cfDateStr = `${d.d1}${d.d2}/${d.m1}${d.m2}/${d.y1}${d.y2}${d.y3}${d.y4}`;
+  }
+  const cfDate = document.getElementById('cfDate');
+  if (cfDate) cfDate.textContent = cfDateStr;
+
+  const manualDoc = document.getElementById('cqDocNumInput')?.value?.trim();
   const cfDocNum = document.getElementById('cfDocNum');
-  if (cfDocNum) cfDocNum.textContent = currentRecord.paymentNumber || '—';
+  if (cfDocNum) cfDocNum.textContent = manualDoc || currentRecord.paymentNumber || currentRecord.referenceNumber || currentRecord.billNumber || currentRecord.expenseNumber || '—';
+
+  const manualDesc = document.getElementById('cqDescInput')?.value?.trim();
+  const cfDesc = document.getElementById('cfDesc');
+  if (cfDesc) cfDesc.textContent = manualDesc || currentRecord.description || '—';
+
+  const cfComp = document.getElementById('cfCompany');
+  if (cfComp) cfComp.textContent = companyText || 'IRSCL';
 }
 
 function onAmountChange() {
@@ -452,7 +471,7 @@ function getSavedRefreshToken() {
 }
 
 function getOrgId() {
-  return localStorage.getItem('zoho_org_id') || '940082326';
+  return localStorage.getItem('zoho_org_id') || '851035268';
 }
 
 function connectZoho() {

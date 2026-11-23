@@ -1,8 +1,8 @@
 @echo off
-title MEP Engineering & Trading - Cheque Printer
+title IRSCL - Cheque Printer
 cd /d "%~dp0"
 echo ========================================================
-echo  MEP ENGINEERING & TRADING COMPANY (PVT) LTD
+echo  IRSCL
 echo  Cheque & Voucher Print System
 echo  Starting local server on http://localhost:8888 ...
 echo ========================================================

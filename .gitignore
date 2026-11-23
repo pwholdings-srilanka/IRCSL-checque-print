@@ -1,10 +1,6 @@
-node_modules/
 .env
 tokens.json
+node_modules/
 .DS_Store
-Thumbs.db
 *.log
-stderr.log
-tmp/
-app.js
-
+scripts/

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MEP Engineering &amp; Trading Company (Pvt) Ltd — Intelligent Cheque Writer &amp; Printer</title>
+  <title>IRSCL — Intelligent Cheque Writer &amp; Printer</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&family=Courier+Prime:wght@400;700&display=swap" rel="stylesheet">
   <style>
@@ -253,25 +253,61 @@
       transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), height 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
-    /* Counterfoil / Left Stub Paper */
+    /* Counterfoil / Left Stub Paper (Pre-printed Cheque Leaf Alignment) */
     .counterfoil-paper {
-      width: 2.75in;
-      height: 3.875in;
-      border-right: 1.5px dashed #64748b;
-      padding: 12px 14px;
-      font-size: 11px;
+      width: var(--stub-width, 55mm);
+      min-width: var(--stub-width, 55mm);
+      max-width: var(--stub-width, 55mm);
+      height: 89mm;
+      min-height: 89mm;
+      border: none;
       position: relative;
       background: #f8fafc;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
+      box-sizing: border-box;
+      flex-shrink: 0;
+      overflow: visible;
+      display: block !important;
     }
-    .cf-title { font-size: 11px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #000; padding-bottom: 4px; margin-bottom: 8px; }
-    .cf-field { margin-bottom: 8px; }
-    .cf-label { font-size: 9.5px; font-weight: 700; color: #475569; text-transform: uppercase; }
-    .cf-val { font-size: 11.5px; font-weight: 700; font-family: 'Space Mono', monospace; border-bottom: 1px solid #94a3b8; min-height: 16px; padding: 1px 0; }
-
-    /* Main Cheque Paper (178mm x 89mm / 7in x 3.5in) */
+    .counterfoil-paper .cf-val {
+      position: absolute !important;
+      font-family: 'Plus Jakarta Sans', Arial, -apple-system, sans-serif;
+      font-weight: 700;
+      color: #0f172a;
+      white-space: nowrap;
+      line-height: 1;
+      border: none;
+      user-select: text;
+      left: var(--cf-text-start, 11.5mm);
+      max-width: calc(54mm - var(--cf-text-start, 11.5mm));
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #cfDate {
+      top: calc(var(--cf-date-line, 13mm) + var(--stub-shift-x, 0mm));
+      font-size: var(--stub-font-size, 10.5px);
+    }
+    #cfPayee {
+      top: calc(var(--cf-payee-line, 20mm) + var(--stub-shift-x, 0mm));
+      font-size: var(--stub-font-size, 10.5px);
+    }
+    #cfPayee2 {
+      top: calc(var(--cf-payee2-line, 26.5mm) + var(--stub-shift-x, 0mm));
+      font-size: var(--stub-font-size, 10.5px);
+    }
+    #cfDocNum {
+      top: calc(var(--cf-doc-line, 33.5mm) + var(--stub-shift-x, 0mm));
+      font-size: var(--stub-font-size, 10.5px);
+      display: block !important;
+    }
+    #cfDesc {
+      display: none !important;
+    }
+    #cfAmt {
+      top: calc(var(--cf-amt-line, 57mm) + var(--stub-shift-x, 0mm));
+      font-size: var(--stub-amt-size, 12.5px);
+      font-weight: 800;
+    }
+/* Main Cheque Paper (178mm x 89mm / 7in x 3.5in) */
     .cheque-paper {
       width: 178mm;
       min-width: 178mm;
@@ -319,8 +355,29 @@
       transform-origin: 0 0 !important;
       transform: rotate(-90deg) translate(-178mm, 0) !important;
     }
-    .full-cheque-wrapper.rot-270 .counterfoil-paper {
+    body.mode-cheque-single .full-cheque-wrapper.rot-270 .counterfoil-paper {
       display: none !important;
+    }
+    body.mode-cheque-stub .full-cheque-wrapper.rot-270 {
+      height: calc(var(--stub-top, 178mm) + var(--stub-width, 55mm)) !important;
+    }
+    body.mode-cheque-stub .full-cheque-wrapper.rot-270 .cheque-paper {
+      position: absolute !important;
+      top: 0 !important;
+      left: 0 !important;
+    }
+    body.mode-cheque-stub .full-cheque-wrapper.rot-270 .counterfoil-paper {
+      display: flex !important;
+      position: absolute !important;
+      top: var(--stub-top, 178mm) !important;
+      left: var(--stub-shift-x, 0mm) !important;
+      width: var(--stub-width, 55mm) !important;
+      min-width: var(--stub-width, 55mm) !important;
+      max-width: var(--stub-width, 55mm) !important;
+      height: 89mm !important;
+      transform-origin: 0 0 !important;
+      transform: rotate(-90deg) translate(calc(-1 * var(--stub-width, 55mm)), 0) !important;
+      border: none !important;
     }
 
     /* 90°: Vertical (90° Clockwise — Logo first) */
@@ -641,6 +698,45 @@
         display: none !important;
       }
 
+      /* 0° Horizontal with Counterfoil */
+      body.mode-cheque-stub.feed-rot-0 .counterfoil-paper,
+      body.mode-cheque-stub.feed-horizontal .counterfoil-paper {
+        display: flex !important;
+        width: var(--stub-width, 55mm) !important;
+        height: 89mm !important;
+        position: relative !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        border: none !important;
+        margin-top: var(--master-top, 0mm) !important;
+        margin-left: calc(var(--master-left, 111.0mm) - var(--stub-width, 55mm)) !important;
+      }
+
+      /* 270° Canon Clamped Tray with Counterfoil */
+      body.mode-cheque-stub.feed-rot-270 .counterfoil-paper,
+      body.mode-cheque-stub.feed-vert-canon .counterfoil-paper {
+        display: flex !important;
+        width: var(--stub-width, 55mm) !important;
+        height: 89mm !important;
+        position: absolute !important;
+        transform-origin: 0 0 !important;
+        transform: rotate(-90deg) translate(calc(-1 * var(--stub-width, 55mm)), 0) !important;
+        top: calc(var(--master-top, 0mm) + var(--stub-top, 178mm)) !important;
+        left: calc(var(--master-left, 111.0mm) + var(--stub-shift-x, 0mm)) !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+        page-break-before: avoid !important;
+        box-shadow: none !important;
+        background: transparent !important;
+        border: none !important;
+      }
+      body.mode-cheque-stub.feed-rot-270 .cheque-paper,
+      body.mode-cheque-stub.feed-vert-canon .cheque-paper {
+        top: var(--master-top, 0mm) !important;
+        page-break-inside: avoid !important;
+        page-break-after: avoid !important;
+      }
+
       /* 0° Horizontal (178mm Wide Edge — Photo 1) */
       body.feed-rot-0 .cheque-paper,
       body.feed-horizontal .cheque-paper {
@@ -706,10 +802,10 @@
 
   <header class="app-nav no-print">
     <div class="brand-group">
-      <div class="brand-logo">MEP</div>
+      <div class="brand-logo">IRSCL</div>
       <div>
-        <div class="brand-title">MEP Engineering &amp; Trading Company (Pvt) Ltd</div>
-        <div class="brand-sub" id="headerBrandSub">Auto-fill &amp; 1-Click Print Engine (Org: 940082326)</div>
+        <div class="brand-title">IRSCL</div>
+        <div class="brand-sub" id="headerBrandSub">Auto-fill &amp; 1-Click Print Engine (Org: 851035268)</div>
       </div>
     </div>
 
@@ -717,7 +813,7 @@
     <div class="header-org-selector" style="display:flex; align-items:center; gap:8px; background:#0f172a; border:1px solid #38bdf8; padding:4px 12px; border-radius:10px;">
       <span style="font-size:12px; font-weight:800; color:#38bdf8; text-transform:uppercase; letter-spacing:0.5px; white-space:nowrap;">🏢 Organization:</span>
       <select id="topOrgSelect" onchange="onOrganizationChange(this.value)" style="background:#1e293b; color:#fff; font-size:12.5px; font-weight:700; border:1px solid #475569; padding:5px 10px; border-radius:6px; cursor:pointer; min-width:280px;">
-        <option value="940082326" data-name="MEP Engineering &amp; Trading Company (Pvt) Ltd" selected>MEP Engineering &amp; Trading Company (Pvt) Ltd (940082326)</option>
+        <option value="851035268" data-name="IRSCL" selected>IRSCL (851035268)</option>
       </select>
     </div>
 
@@ -748,7 +844,7 @@
           <div class="ctrl-item" style="background:#1e293b; border:1.5px solid #38bdf8; padding:4px 10px; border-radius:8px; box-shadow:0 0 10px rgba(56,189,248,0.15);">
             <label style="color:#38bdf8; font-weight:800; font-size:13px;">🏢 Branch / Org:</label>
             <select id="toolbarOrgSelect" onchange="onOrganizationChange(this.value)" style="min-width:270px; background:#0f172a; color:#fff; font-weight:700; border:1px solid #334155; padding:5px 8px; border-radius:6px; cursor:pointer;">
-              <option value="940082326" data-name="MEP Engineering &amp; Trading Company (Pvt) Ltd" selected>MEP Engineering &amp; Trading Company (Pvt) Ltd (940082326)</option>
+              <option value="851035268" data-name="IRSCL" selected>IRSCL (851035268)</option>
             </select>
           </div>
 
@@ -758,7 +854,7 @@
               <option value="">Loading Zoho payments...</option>
             </select>
             <button class="btn btn-secondary btn-sm" onclick="loadQuickPayments(true)" title="Refresh Payments">🔄</button>
-            <button id="btnUnlockKey" class="btn btn-warning btn-sm" onclick="promptMepKey()" style="display:none; font-weight:700;" title="Unlock MEP Engineering Payments">🔑 Unlock</button>
+            
           </div>
 
           <div class="ctrl-item">
@@ -856,12 +952,28 @@
           </div>
 
           <div class="ctrl-item">
-            <label><input type="checkbox" id="chkCounterfoil" onchange="toggleCounterfoil()"> 📋 Counterfoil / Stub (Left)</label>
+            <label title="Enable attached Cheque Stub"><input type="checkbox" id="chkCounterfoil" onchange="toggleCounterfoil()"> 📋 Counterfoil / Stub (Left)</label>
+            <div class="ctrl-item" id="paperSizeContainer" style="display:inline-flex; align-items:center; gap:6px; background:#0f172a; padding:3px 8px; border-radius:6px; border:1px solid #334155;">
+              <span style="font-size:11.5px; font-weight:700; color:#38bdf8;">📄 Paper:</span>
+              <select id="cqPaperSize" onchange="onPaperSizeChange(this.value)" style="background:#1e293b; color:#fff; border:1px solid #475569; font-size:11.5px; padding:3px 6px; border-radius:4px; font-weight:600; cursor:pointer;" title="Select Paper Size for Print (Envelope #10 for Cheque+Stub, Envelope Monarch for Cheque Only)">
+                <option value="env10" selected>Envelope #10 (9.5" / 241mm) — Cheque + Stub</option>
+                <option value="custom240">Custom (89mm × 240mm)</option>
+                <option value="monarch">Envelope Monarch (7.5" / 190mm) — Cheque Only</option>
+                <option value="a4">A4 (210mm × 297mm)</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="ctrl-item" id="stubControlsBox" style="display:none; background:rgba(56, 189, 248, 0.08); border:1px solid #38bdf8; border-radius:6px; padding:3px 8px; align-items:center; gap:8px;">
+            <label style="color:#38bdf8; font-weight:700; font-size:11.5px;">Cheque / Doc #:</label>
+            <input type="text" id="cqDocNumInput" placeholder="Cheque / Doc #" oninput="updateLiveCheque()" style="width:125px; padding:3px 6px; font-size:12px; font-weight:700; background:#0f172a; color:#38bdf8; border:1px solid #334155; border-radius:4px;">
+            <label style="color:#38bdf8; font-weight:700; font-size:11.5px;">For (Memo):</label>
+            <input type="text" id="cqDescInput" placeholder="Purpose / Account" oninput="updateLiveCheque()" style="width:150px; padding:3px 6px; font-size:12px; background:#0f172a; color:#fff; border:1px solid #334155; border-radius:4px;">
           </div>
 
           <div class="ctrl-item">
             <label><input type="checkbox" id="chkCompany" onchange="updateLiveCheque()"> 🏢 Company Label</label>
-            <input type="text" id="cqCompanyInput" value="MEP Engineering & Trading Company (Pvt) Ltd" oninput="updateLiveCheque()" style="width:230px; padding:3px 6px; font-size:12px; font-weight:700;">
+            <input type="text" id="cqCompanyInput" value="IRSCL" oninput="updateLiveCheque()" style="width:230px; padding:3px 6px; font-size:12px; font-weight:700;">
           </div>
 
           <div class="ctrl-item">
@@ -912,28 +1024,14 @@
 
           <div class="full-cheque-wrapper rot-270" id="fullChequeWrapper">
 
-            <!-- Optional Counterfoil / Cheque Book Stub (Left Part) -->
+            <!-- Optional Counterfoil / Cheque Book Stub (Pre-printed Cheque Leaf Alignment) -->
             <div class="counterfoil-paper" id="counterfoilPaper" style="display:none;">
-              <div class="cf-title">Cheque Counterfoil</div>
-              <div>
-                <div class="cf-field">
-                  <div class="cf-label">Date:</div>
-                  <div class="cf-val" id="cfDate">20/07/2026</div>
-                </div>
-                <div class="cf-field">
-                  <div class="cf-label">Cheque / Voucher #:</div>
-                  <div class="cf-val" id="cfDocNum">26072011</div>
-                </div>
-                <div class="cf-field">
-                  <div class="cf-label">To (Payee):</div>
-                  <div class="cf-val" id="cfPayee">AP Holdings</div>
-                </div>
-                <div class="cf-field">
-                  <div class="cf-label">Amount (Rs):</div>
-                  <div class="cf-val" id="cfAmt">18.00</div>
-                </div>
-              </div>
-              <div style="font-size:9px; color:#64748b; text-align:center; font-weight:bold;">MEP ENGINEERING &amp; TRADING COMPANY (PVT) LTD</div>
+              <div class="cf-val" id="cfDate" title="Date">—</div>
+              <div class="cf-val" id="cfPayee" title="Payee Name (Line 1)">—</div>
+              <div class="cf-val" id="cfPayee2" title="Payee Name (Line 2)"></div>
+              <div class="cf-val" id="cfDocNum" title="Cheque / Doc #"></div>
+              <div class="cf-val" id="cfDesc" title="Memo / Description" style="display:none;"></div>
+              <div class="cf-val" id="cfAmt" title="Amount (Rs)">—</div>
             </div>
 
             <!-- Main Cheque Paper Area (7.5" x 3.875") -->
@@ -970,7 +1068,7 @@
               <div class="cq-amount-num" id="cqAmountNum"><b>18.00</b></div>
 
               <!-- Company Label -->
-              <div class="cq-company" id="cqCompany">MEP ENGINEERING &amp; TRADING COMPANY (PVT) LTD</div>
+              <div class="cq-company" id="cqCompany">IRSCL</div>
 
               <!-- Signatures -->
               <div class="cq-signatures" id="cqSignatures">
@@ -1111,6 +1209,75 @@
             </div>
           </div>
 
+          <!-- Counterfoil / Stub Alignment -->
+          <div class="calib-group" id="calibStubGroup" style="border-left:3px solid #38bdf8;">
+            <div class="calib-header"><span style="color:#38bdf8; font-weight:800;">📋 Counterfoil / Stub Lines</span><span id="valStub">174.5mm, 8/32/65mm</span></div>
+            
+            <div style="font-size:11px; color:#94a3b8; margin-bottom:8px; line-height:1.35;">
+              5 separate lines for pre-printed Stub. Labels are hidden.
+            </div>
+
+            <div class="calib-row">
+              <span style="width:84px;" title="Stub start position from Date edge (default 166mm)">Top / Dist:</span>
+              <input type="range" id="calStubTop" min="140" max="210" step="0.5" value="166" oninput="updateCalib()">
+              <span class="val" id="valStubTop" style="width:36px; font-size:10.5px;">166mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:84px;" title="Nudge all 5 lines together along width">Shift X (All):</span>
+              <input type="range" id="calStubShiftX" min="-20" max="20" step="0.5" value="0" oninput="updateCalib()">
+              <span class="val" id="valStubShiftX" style="width:36px; font-size:10.5px;">0mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:84px;" title="Horizontal start distance after labels">Line Start:</span>
+              <input type="range" id="calStubTextStart" min="0" max="35" step="0.5" value="11.5" oninput="updateCalib()">
+              <span class="val" id="valStubTextStart" style="width:36px; font-size:10.5px;">11.5mm</span>
+            </div>
+
+            <div style="border-top:1px dashed #334155; margin:6px 0 4px 0; padding-top:4px; font-size:11px; font-weight:700; color:#38bdf8;">
+              📍 Pre-printed Line Positions:
+            </div>
+
+            <div class="calib-row">
+              <span style="width:84px;">1. Date Line:</span>
+              <input type="range" id="calStubDateLine" min="5" max="25" step="0.5" value="13" oninput="updateCalib()">
+              <span class="val" id="valStubDateLine" style="width:36px; font-size:10.5px;">13mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:84px;">2. Payee Line:</span>
+              <input type="range" id="calStubPayeeLine" min="10" max="32" step="0.5" value="20" oninput="updateCalib()">
+              <span class="val" id="valStubPayeeLine" style="width:36px; font-size:10.5px;">20mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:84px;">3. Payee Line 2:</span>
+              <input type="range" id="calStubDocLine" min="18" max="38" step="0.5" value="26.5" oninput="updateCalib()">
+              <span class="val" id="valStubDocLine" style="width:36px; font-size:10.5px;">26.5mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:84px;">4. Doc # Line:</span>
+              <input type="range" id="calStubDescLine" min="22" max="45" step="0.5" value="33.5" oninput="updateCalib()">
+              <span class="val" id="valStubDescLine" style="width:36px; font-size:10.5px;">33.5mm</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:84px;">5. This Cheque:</span>
+              <input type="range" id="calStubAmtLine" min="40" max="75" step="0.5" value="57" oninput="updateCalib()">
+              <span class="val" id="valStubAmtLine" style="width:36px; font-size:10.5px;">57mm</span>
+            </div>
+
+            <div style="border-top:1px dashed #334155; margin:6px 0 4px 0; padding-top:4px; font-size:11px; font-weight:700; color:#94a3b8;">
+              🔤 Font Sizes:
+            </div>
+            <div class="calib-row">
+              <span style="width:84px;">Font Size:</span>
+              <input type="range" id="calStubFontSize" min="8" max="16" step="0.5" value="10.5" oninput="updateCalib()">
+              <span class="val" id="valStubFontSize" style="width:36px; font-size:10.5px;">10.5px</span>
+            </div>
+            <div class="calib-row">
+              <span style="width:84px;">Amount Size:</span>
+              <input type="range" id="calStubAmtFontSize" min="9" max="18" step="0.5" value="12.5" oninput="updateCalib()">
+              <span class="val" id="valStubAmtFontSize" style="width:36px; font-size:10.5px;">12.5px</span>
+            </div>
+          </div>
+
           <button class="btn btn-primary" style="width:100%; margin-top:8px; font-weight:700;" onclick="saveBankProfile()">💾 Save Bank Calibration</button>
           <div style="display:flex; gap:6px; margin-top:6px;">
             <button class="btn btn-secondary btn-sm" style="flex:1; font-size:11px;" onclick="exportCalibration()" title="Download calibration JSON backup">📥 Backup JSON</button>
@@ -1135,7 +1302,7 @@
             <div style="font-size:12px; color:var(--text-muted); display:flex; align-items:center; gap:8px;">
               <span style="font-weight:700; color:#38bdf8;">🏢 Active Organization:</span>
               <select id="recentOrgSelect" onchange="onOrganizationChange(this.value)" style="background:#0f172a; color:#fff; border:1px solid #38bdf8; font-weight:700; border-radius:6px; padding:4px 10px; font-size:12.5px; cursor:pointer; min-width:320px;">
-                <option value="940082326" data-name="MEP Engineering &amp; Trading Company (Pvt) Ltd" selected>MEP Engineering &amp; Trading Company (Pvt) Ltd (940082326)</option>
+                <option value="851035268" data-name="IRSCL" selected>IRSCL (851035268)</option>
               </select>
             </div>
           </div>
@@ -1156,36 +1323,24 @@
         <div style="margin-bottom:14px;">
           <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Active Organization</label>
           <select id="settingsOrgSelect" onchange="onOrganizationChange(this.value)" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-weight:700;">
-            <option value="940082326" data-name="MEP Engineering &amp; Trading Company (Pvt) Ltd" selected>MEP Engineering &amp; Trading Company (Pvt) Ltd (940082326)</option>
+            <option value="851035268" data-name="IRSCL" selected>IRSCL (851035268)</option>
           </select>
         </div>
         <div style="margin-bottom:14px;">
           <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Organization ID</label>
-          <input type="text" id="cfgOrgId" value="940082326" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#38bdf8; border-radius:6px; font-family:monospace; font-weight:700;">
+          <input type="text" id="cfgOrgId" value="851035268" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#38bdf8; border-radius:6px; font-family:monospace; font-weight:700;">
         </div>
-        <div style="margin-bottom:14px;">
-          <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Zoho Client ID</label>
-          <input type="text" id="cfgClientId" value="1000.GRDR1K3KJ4DMA8DOGKE35LDFI277ZH" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-family:monospace; font-size:12px;">
-        </div>
-        <div style="margin-bottom:14px;">
-          <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Permanent Zoho Refresh Token (Persisted in Browser)</label>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="cfgRefreshToken" placeholder="Auto-saved on Connect" style="flex:1; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#38bdf8; border-radius:6px; font-family:monospace; font-size:12px;">
-            <button class="btn btn-secondary btn-sm" onclick="saveManualRefreshToken()">Save</button>
+        
+        <!-- Server Environment Config Banner -->
+        <div style="background:#0b1329; border:1px solid #1e293b; border-left:4px solid #10b981; border-radius:8px; padding:14px; margin-bottom:18px;">
+          <div style="color:#6ee7b7; font-weight:700; font-size:13.5px; margin-bottom:4px;">🟢 Server Credentials (.env) Active</div>
+          <div style="color:#94a3b8; font-size:12px; line-height:1.45;">
+            Zoho Books API credentials (Client ID, Client Secret, Refresh Token) are loaded directly from the server's <code>.env</code> file. No manual key entry needed.
           </div>
-          <small style="color:var(--text-muted); display:block; margin-top:4px;">Saved in browser localStorage to stay permanently connected without disconnecting.</small>
-        </div>
-        <div style="margin-bottom:14px;">
-          <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">🔑 MEP Security / Access Key</label>
-          <div style="display:flex; gap:8px;">
-            <input type="text" id="cfgMepAppKey" placeholder="e.g. 940082326 or mep-940082326-secure" style="flex:1; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#38bdf8; border-radius:6px; font-family:monospace; font-size:12px;">
-            <button class="btn btn-secondary btn-sm" onclick="saveManualAppKey()">Save Key</button>
-          </div>
-          <small style="color:var(--text-muted); display:block; margin-top:4px;">Required for remote access to MEP Engineering payments (Default Org ID: <strong>940082326</strong>).</small>
         </div>
         <div style="margin-bottom:14px;">
           <label style="font-size:12px; font-weight:700; color:var(--text-muted); display:block; margin-bottom:4px;">Default Company Label on Cheque</label>
-          <input type="text" id="cfgCompanyName" value="MEP Engineering & Trading Company (Pvt) Ltd" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-weight:700;">
+          <input type="text" id="cfgCompanyName" value="IRSCL" style="width:100%; background:#0f172a; border:1px solid #334155; padding:8px 12px; color:#fff; border-radius:6px; font-weight:700;">
         </div>
         <div style="margin-top:20px; display:flex; gap:10px;">
           <button class="btn btn-primary" onclick="startOAuth()">Connect with Zoho Books</button>
@@ -1424,6 +1579,7 @@
       currentRecord.amountInWords = applyTextCase(rawWords, wordsCase);
       document.getElementById('cqWordsInput').value = currentRecord.amountInWords;
       updateLiveCheque();
+    loadQuickPayments(true); // startup load
     }
 
     function onDateChange() {
@@ -1438,11 +1594,52 @@
       updateLiveCheque();
     }
 
+    function onPaperSizeChange(val) {
+      try { localStorage.setItem('pw_paper_size', val); } catch(_) {}
+      updatePrintPageSize();
+      toast('📄 Print paper size set: ' + (val === 'env10' ? 'Envelope #10 (COM10)' : val === 'monarch' ? 'Envelope Monarch' : val));
+    }
+
+    function updatePrintPageSize() {
+      const isStub = document.getElementById('chkCounterfoil')?.checked;
+      const sel = document.getElementById('cqPaperSize');
+      const val = (sel && sel.value) ? sel.value : (isStub ? 'env10' : 'monarch');
+      const styleEl = document.getElementById('printPageStyle');
+      if (!styleEl) return;
+      
+      let pageRule = '@page { size: portrait; margin: 0mm !important; }';
+      if (val === 'env10') {
+        // Envelope #10 (4.125" x 9.5" = 104.8mm x 241.3mm) - Perfect for Cheque (178mm) + Stub (55mm)
+        pageRule = '@page { size: 104.8mm 241.3mm; margin: 0mm !important; }';
+      } else if (val === 'custom240') {
+        // Exact 89mm x 240mm Cheque + Stub
+        pageRule = '@page { size: 89mm 240mm; margin: 0mm !important; }';
+      } else if (val === 'monarch') {
+        // Envelope Monarch (3.875" x 7.5" = 98.4mm x 190.5mm) - For Single Cheque Leaf
+        pageRule = '@page { size: 98.4mm 190.5mm; margin: 0mm !important; }';
+      } else if (val === 'a4') {
+        pageRule = '@page { size: 210mm 297mm; margin: 0mm !important; }';
+      }
+      styleEl.textContent = pageRule;
+    }
+
     function toggleCounterfoil() {
       const on = document.getElementById('chkCounterfoil').checked;
-      document.getElementById('counterfoilPaper').style.display = on ? 'flex' : 'none';
+      try { localStorage.setItem('pw_cheque_stub_enabled', on ? '1' : '0'); } catch(_) {}
+      const cfPaper = document.getElementById('counterfoilPaper');
+      if (cfPaper) cfPaper.style.display = on ? 'flex' : 'none';
       document.body.classList.toggle('mode-cheque-stub', on);
       document.body.classList.toggle('mode-cheque-single', !on);
+      const stubBox = document.getElementById('stubControlsBox');
+      if (stubBox) stubBox.style.display = on ? 'inline-flex' : 'none';
+      
+      const pSel = document.getElementById('cqPaperSize');
+      if (pSel) {
+        pSel.value = on ? 'env10' : 'monarch';
+      }
+      updatePrintPageSize();
+      updateLiveCheque();
+      updateCalib();
     }
 
     function toggleGuide() {
@@ -1466,7 +1663,11 @@
       const payeeEl = document.getElementById('cqPayee');
       payeeEl.style.display = showPayee ? 'block' : 'none';
       payeeEl.innerHTML = `${escapeHtml(payeeVal)}`;
-      document.getElementById('cfPayee').textContent = payeeVal;
+      const stubPayeeParts = splitStubPayee(payeeVal);
+      const cfPayeeEl = document.getElementById('cfPayee');
+      if (cfPayeeEl) cfPayeeEl.textContent = stubPayeeParts.line1 || '—';
+      const cfPayee2El = document.getElementById('cfPayee2');
+      if (cfPayee2El) cfPayee2El.textContent = stubPayeeParts.line2 || '';
 
       // Date
       const showDate = document.getElementById('chkDate').checked;
@@ -1493,7 +1694,16 @@
         document.getElementById('y4').textContent = d.y4;
       }
 
-      document.getElementById('cfDate').textContent = `${d.d1}${d.d2}/${d.m1}${d.m2}/${d.y1}${d.y2}${d.y3}${d.y4}`;
+      const rawDate = document.getElementById('cqDateInput')?.value;
+      let cfDateStr = '—';
+      if (rawDate && rawDate.includes('-')) {
+        const dp = rawDate.split('-');
+        if (dp.length === 3) cfDateStr = `${dp[2]}/${dp[1]}/${dp[0]}`;
+      } else if (d && d.d1) {
+        cfDateStr = `${d.d1}${d.d2}/${d.m1}${d.m2}/${d.y1}${d.y2}${d.y3}${d.y4}`;
+      }
+      const cfDateEl = document.getElementById('cfDate');
+      if (cfDateEl) cfDateEl.textContent = cfDateStr;
 
       // Amount (Words)
       const showWords = document.getElementById('chkWords').checked;
@@ -1511,7 +1721,7 @@
       const amtEl = document.getElementById('cqAmountNum');
       amtEl.style.display = showAmt ? 'block' : 'none';
       amtEl.innerHTML = `${amtFmt}`;
-      document.getElementById('cfAmt').textContent = amtFmt;
+      const cfAmtEl = document.getElementById('cfAmt'); if (cfAmtEl) cfAmtEl.textContent = amtVal > 0 ? amtFmt : '—';
 
       // Crossing
       const crossingMode = document.getElementById('cqCrossingSelect').value;
@@ -1577,13 +1787,56 @@
       const sigCount = document.getElementById('cqSigCount').value;
       document.getElementById('sigBlock2').style.display = sigCount === '2' ? 'flex' : 'none';
 
-      // Counterfoil Doc #
-      document.getElementById('cfDocNum').textContent = currentRecord.paymentNumber || '—';
+      // Counterfoil Doc #, Memo & Company
+      const manualDoc = document.getElementById('cqDocNumInput')?.value?.trim();
+      const docNum = manualDoc || currentRecord.paymentNumber || currentRecord.referenceNumber || currentRecord.billNumber || currentRecord.expenseNumber || '';
+      const cfDocEl = document.getElementById('cfDocNum');
+      if (cfDocEl) cfDocEl.textContent = (docNum && docNum !== '—') ? docNum : '';
+
+      const manualDesc = document.getElementById('cqDescInput')?.value?.trim();
+      const descVal = manualDesc || currentRecord.description || '';
+      const cfDescEl = document.getElementById('cfDesc');
+      if (cfDescEl) cfDescEl.textContent = descVal || '';
     }
 
     function escapeHtml(s) {
       if (!s) return '';
       return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+    }
+
+    function splitStubPayee(name, maxChars = 22) {
+      if (!name || name === '—') return { line1: '—', line2: '' };
+      name = name.trim();
+      const words = name.split(/\s+/);
+      if (words.length === 1) {
+        if (name.length > maxChars) {
+          const half = Math.min(maxChars - 1, Math.ceil(name.length / 2));
+          return { line1: name.slice(0, half) + '-', line2: name.slice(half) };
+        }
+        return { line1: name, line2: '' };
+      }
+      if (words.length === 2 && name.length > 14) {
+        return { line1: words[0], line2: words[1] };
+      }
+      let line1 = '';
+      let line2 = '';
+      for (let i = 0; i < words.length; i++) {
+        const w = words[i];
+        if (!line2 && (!line1 || (line1 + ' ' + w).length <= maxChars)) {
+          line1 = line1 ? line1 + ' ' + w : w;
+        } else {
+          line2 = line2 ? line2 + ' ' + w : w;
+        }
+      }
+      if (!line2 && words.length >= 2 && name.length > 15) {
+        const mid = Math.ceil(words.length / 2);
+        line1 = words.slice(0, mid).join(' ');
+        line2 = words.slice(mid).join(' ');
+      }
+      if (line2.length > maxChars + 6) {
+        line2 = line2.substring(0, maxChars + 5) + '…';
+      }
+      return { line1, line2 };
     }
 
     let currentRotation = 0; // 0, 90, 180, 270
@@ -1778,6 +2031,41 @@ function nudgeMaster(dTop, dLeft) {
       amtEl.style.top = aTop + 'mm';
       amtEl.style.right = aRight + 'mm';
       amtEl.style.fontSize = dFontSize + 'px';
+
+      // Counterfoil / Stub Alignment
+      const stubTop = parseFloat(document.getElementById('calStubTop')?.value || 166);
+      const stubShiftX = parseFloat(document.getElementById('calStubShiftX')?.value || 0);
+      const stubTextStart = parseFloat(document.getElementById('calStubTextStart')?.value || 11.5);
+      const stubDateLine = parseFloat(document.getElementById('calStubDateLine')?.value || 13);
+      const stubPayeeLine = parseFloat(document.getElementById('calStubPayeeLine')?.value || 20);
+      const stubPayee2Line = parseFloat(document.getElementById('calStubDocLine')?.value || 26.5);
+      const stubDocLine = parseFloat(document.getElementById('calStubDescLine')?.value || 33.5);
+      const stubAmtLine = parseFloat(document.getElementById('calStubAmtLine')?.value || 57);
+      const stubFontSize = parseFloat(document.getElementById('calStubFontSize')?.value || 10.5);
+      const stubAmtFontSize = parseFloat(document.getElementById('calStubAmtFontSize')?.value || 12.5);
+
+      document.documentElement.style.setProperty('--stub-top', stubTop + 'mm');
+      document.documentElement.style.setProperty('--stub-shift-x', stubShiftX + 'mm');
+      document.documentElement.style.setProperty('--cf-text-start', stubTextStart + 'mm');
+      document.documentElement.style.setProperty('--cf-date-line', stubDateLine + 'mm');
+      document.documentElement.style.setProperty('--cf-payee-line', stubPayeeLine + 'mm');
+      document.documentElement.style.setProperty('--cf-payee2-line', stubPayee2Line + 'mm');
+      document.documentElement.style.setProperty('--cf-doc-line', stubDocLine + 'mm');
+      document.documentElement.style.setProperty('--cf-amt-line', stubAmtLine + 'mm');
+      document.documentElement.style.setProperty('--stub-font-size', stubFontSize + 'px');
+      document.documentElement.style.setProperty('--stub-amt-size', stubAmtFontSize + 'px');
+
+      if (document.getElementById('valStub')) document.getElementById('valStub').textContent = `${stubTop}mm, ${stubDateLine}/${stubPayeeLine}/${stubAmtLine}mm`;
+      if (document.getElementById('valStubTop')) document.getElementById('valStubTop').textContent = `${stubTop}mm`;
+      if (document.getElementById('valStubShiftX')) document.getElementById('valStubShiftX').textContent = `${stubShiftX}mm`;
+      if (document.getElementById('valStubTextStart')) document.getElementById('valStubTextStart').textContent = `${stubTextStart}mm`;
+      if (document.getElementById('valStubDateLine')) document.getElementById('valStubDateLine').textContent = `${stubDateLine}mm`;
+      if (document.getElementById('valStubPayeeLine')) document.getElementById('valStubPayeeLine').textContent = `${stubPayeeLine}mm`;
+      if (document.getElementById('valStubDocLine')) document.getElementById('valStubDocLine').textContent = `${stubPayee2Line}mm`;
+      if (document.getElementById('valStubDescLine')) document.getElementById('valStubDescLine').textContent = `${stubDocLine}mm`;
+      if (document.getElementById('valStubAmtLine')) document.getElementById('valStubAmtLine').textContent = `${stubAmtLine}mm`;
+      if (document.getElementById('valStubFontSize')) document.getElementById('valStubFontSize').textContent = `${stubFontSize}px`;
+      if (document.getElementById('valStubAmtFontSize')) document.getElementById('valStubAmtFontSize').textContent = `${stubAmtFontSize}px`;
     }
 
     function applyBankPreset(presetKey) {
@@ -1792,6 +2080,20 @@ function nudgeMaster(dTop, dLeft) {
           if (presetKey === 'commercial' && (parseFloat(parsed.dateTop || 0) < 20 || parseFloat(parsed.payeeTop || 0) < 35)) {
             localStorage.removeItem('pw_calib_commercial');
           } else {
+            // Invalidate stale stub positions if amount line < 50mm or stubTextStart < 10mm or > 15mm or stubDateLine != 13
+            if (parsed.stubAmtLine && (parseFloat(parsed.stubAmtLine) < 50 || parseFloat(parsed.stubTextStart || 0) < 10 || parseFloat(parsed.stubTextStart || 0) > 15 || parseFloat(parsed.stubDateLine || 0) !== 13)) {
+              delete parsed.stubAmtLine;
+              delete parsed.stubDateLine;
+              delete parsed.stubDocLine;
+              delete parsed.stubPayeeLine;
+              delete parsed.stubDescLine;
+              delete parsed.stubTextStart;
+              delete parsed.stubTop;
+              delete parsed.stubShiftX;
+              delete parsed.stubFontSize;
+              delete parsed.stubAmtFontSize;
+              localStorage.setItem('pw_calib_' + presetKey, JSON.stringify(parsed));
+            }
             p = { ...p, ...parsed };
           }
         } catch (_) {}
@@ -1819,6 +2121,16 @@ function nudgeMaster(dTop, dLeft) {
       if (document.getElementById('calWordsLeft')) document.getElementById('calWordsLeft').value = p.wordsLeft;
       if (document.getElementById('calAmtTop')) document.getElementById('calAmtTop').value = p.amtTop;
       if (document.getElementById('calAmtRight')) document.getElementById('calAmtRight').value = p.amtRight;
+      if (document.getElementById('calStubTop')) document.getElementById('calStubTop').value = p.stubTop || 166;
+      if (document.getElementById('calStubShiftX')) document.getElementById('calStubShiftX').value = (p.stubShiftX !== undefined) ? p.stubShiftX : 0;
+      if (document.getElementById('calStubTextStart')) document.getElementById('calStubTextStart').value = (p.stubTextStart !== undefined) ? p.stubTextStart : 11.5;
+      if (document.getElementById('calStubDateLine')) document.getElementById('calStubDateLine').value = p.stubDateLine || 13;
+      if (document.getElementById('calStubPayeeLine')) document.getElementById('calStubPayeeLine').value = p.stubPayeeLine || 20;
+      if (document.getElementById('calStubDocLine')) document.getElementById('calStubDocLine').value = p.stubDocLine || 26.5;
+      if (document.getElementById('calStubDescLine')) document.getElementById('calStubDescLine').value = p.stubDescLine || 33.5;
+      if (document.getElementById('calStubAmtLine')) document.getElementById('calStubAmtLine').value = p.stubAmtLine || 57;
+      if (document.getElementById('calStubFontSize')) document.getElementById('calStubFontSize').value = p.stubFontSize || 10.5;
+      if (document.getElementById('calStubAmtFontSize')) document.getElementById('calStubAmtFontSize').value = p.stubAmtFontSize || 12.5;
       updateLiveCheque();
       updateCalib();
     }
@@ -1850,6 +2162,16 @@ function nudgeMaster(dTop, dLeft) {
         wordsLeft: parseFloat(document.getElementById('calWordsLeft')?.value || 17.5),
         amtTop: parseFloat(document.getElementById('calAmtTop')?.value || 57),
         amtRight: parseFloat(document.getElementById('calAmtRight')?.value || 38),
+        stubTop: parseFloat(document.getElementById('calStubTop')?.value || 166),
+        stubShiftX: parseFloat(document.getElementById('calStubShiftX')?.value || 0),
+        stubTextStart: parseFloat(document.getElementById('calStubTextStart')?.value || 11.5),
+        stubDateLine: parseFloat(document.getElementById('calStubDateLine')?.value || 13),
+        stubPayeeLine: parseFloat(document.getElementById('calStubPayeeLine')?.value || 20),
+        stubDocLine: parseFloat(document.getElementById('calStubDocLine')?.value || 26.5),
+        stubDescLine: parseFloat(document.getElementById('calStubDescLine')?.value || 33.5),
+        stubAmtLine: parseFloat(document.getElementById('calStubAmtLine')?.value || 57),
+        stubFontSize: parseFloat(document.getElementById('calStubFontSize')?.value || 10.5),
+        stubAmtFontSize: parseFloat(document.getElementById('calStubAmtFontSize')?.value || 12.5),
       };
 
       // 1. Save locally to browser
@@ -1894,6 +2216,16 @@ function nudgeMaster(dTop, dLeft) {
           wordsLeft: parseFloat(document.getElementById('calWordsLeft')?.value || 17.5),
           amtTop: parseFloat(document.getElementById('calAmtTop')?.value || 57),
           amtRight: parseFloat(document.getElementById('calAmtRight')?.value || 38),
+          stubTop: parseFloat(document.getElementById('calStubTop')?.value || 166),
+          stubShiftX: parseFloat(document.getElementById('calStubShiftX')?.value || 0),
+          stubTextStart: parseFloat(document.getElementById('calStubTextStart')?.value || 11.5),
+          stubDateLine: parseFloat(document.getElementById('calStubDateLine')?.value || 13),
+          stubPayeeLine: parseFloat(document.getElementById('calStubPayeeLine')?.value || 20),
+          stubDocLine: parseFloat(document.getElementById('calStubDocLine')?.value || 26.5),
+          stubDescLine: parseFloat(document.getElementById('calStubDescLine')?.value || 33.5),
+          stubAmtLine: parseFloat(document.getElementById('calStubAmtLine')?.value || 57),
+          stubFontSize: parseFloat(document.getElementById('calStubFontSize')?.value || 10.5),
+          stubAmtFontSize: parseFloat(document.getElementById('calStubAmtFontSize')?.value || 12.5),
         },
         exportedAt: new Date().toISOString()
       };
@@ -1949,23 +2281,23 @@ function nudgeMaster(dTop, dLeft) {
     }
 
     const KNOWN_ORGANIZATIONS = [
-      { organization_id: '940082326', name: 'MEP Engineering & Trading Company (Pvt) Ltd', is_default_org: true }
+      { organization_id: '851035268', name: 'IRSCL', is_default_org: true }
     ];
 
     let currentOrganizations = [...KNOWN_ORGANIZATIONS];
     let savedOrg = localStorage.getItem('selected_org_id');
     if (!savedOrg || savedOrg === '933829154' || String(savedOrg).startsWith('935')) {
-      savedOrg = '940082326';
-      localStorage.setItem('selected_org_id', '940082326');
-      localStorage.setItem('selected_org_name', 'MEP Engineering & Trading Company (Pvt) Ltd');
+      savedOrg = '851035268';
+      localStorage.setItem('selected_org_id', '851035268');
+      localStorage.setItem('selected_org_name', 'IRSCL');
     }
-    let currentOrgId = '940082326';
-    let currentOrgName = localStorage.getItem('selected_org_name') || 'MEP Engineering & Trading Company (Pvt) Ltd';
+    let currentOrgId = '851035268';
+    let currentOrgName = localStorage.getItem('selected_org_name') || 'IRSCL';
 
     function getOrgId() {
       const cfg = document.getElementById('cfgOrgId')?.value?.trim();
       if (cfg && cfg !== '933829154' && !String(cfg).startsWith('935')) return cfg;
-      return '940082326';
+      return '851035268';
     }
 
     function populateOrgDropdowns(orgs) {
@@ -2027,10 +2359,6 @@ function nudgeMaster(dTop, dLeft) {
       if (cqCompanyEl) {
         cqCompanyEl.textContent = companyUpper;
       }
-      const cfCompanyEl = document.querySelector('.counterfoil-paper > div:last-child');
-      if (cfCompanyEl) {
-        cfCompanyEl.textContent = companyUpper;
-      }
 
       if (autoLoad) {
         toast(`🏢 Switched to: ${currentOrgName}`);
@@ -2044,9 +2372,9 @@ function nudgeMaster(dTop, dLeft) {
 
     async function fetchZohoOrganizations() {
       try {
-        const rt = getSavedRefreshToken();
-        const res = await fetch(`/api/get-record?type=organizations&refresh_token=${encodeURIComponent(rt)}`, {
-          headers: { 'X-Zoho-Refresh-Token': rt }
+        const rt = "";
+        const res = await fetch(`/api/get-record?type=organizations`, {
+          headers: { }
         });
         const data = await res.json();
         if (data && (data.organizations || data.data)) {
@@ -2064,9 +2392,7 @@ function nudgeMaster(dTop, dLeft) {
       }
     }
 
-    const DEFAULT_REFRESH_TOKEN = '1000.0bf5f0ff7c2ce2c10e321eda6aec52bb.113c273332c4bee9f3eab9aa76ffa963';
-
-    function getSavedRefreshToken() {
+    function getRefreshToken() {
       const saved = (document.getElementById('cfgRefreshToken') && document.getElementById('cfgRefreshToken').value.trim()) || localStorage.getItem('zoho_refresh_token');
       // Invalidate old, revoked, or corrupted tokens
       if (saved && saved.length > 20 && !saved.includes('9187') && !saved.includes('57cc') && !saved.includes('57ec')) {
@@ -2118,30 +2444,19 @@ function nudgeMaster(dTop, dLeft) {
     function onQuickPaymentSelect(val) {
       if (!val) return;
       if (val === 'unlock') {
-        promptMepKey();
+        
         return;
       }
       selectPayment(val);
     }
 
-    function promptMepKey() {
-      const entered = prompt('Enter MEP Access Key or Organization ID (Default: 940082326):', '940082326');
-      if (entered && entered.trim()) {
-        localStorage.setItem('mep_app_key', entered.trim());
-        if (document.getElementById('cfgMepAppKey')) {
-          document.getElementById('cfgMepAppKey').value = entered.trim();
-        }
-        toast('🔑 Access Key saved! Loading payments...');
-        loadQuickPayments(true);
-        loadRecentPayments();
-      }
-    }
+    function promptMepKey() { return; }
 
     function saveManualAppKey() {
-      const val = document.getElementById('cfgMepAppKey')?.value.trim();
+      const val = document.getElementById('cfgAppKey')?.value.trim();
       if (val) {
-        localStorage.setItem('mep_app_key', val);
-        toast('✅ MEP Access Key saved!');
+        localStorage.setItem('app_key', val);
+        toast('✅ IRSCL Access Key saved!');
         loadQuickPayments(true);
         loadRecentPayments();
       }
@@ -2152,26 +2467,22 @@ function nudgeMaster(dTop, dLeft) {
       const sel = document.getElementById('quickPaymentSelect');
       const btnUnlock = document.getElementById('btnUnlockKey');
       if (!sel) return;
-      if (!checkMepSecurity()) {
-        sel.innerHTML = '<option value="unlock">🔒 Remote access locked — Click to Unlock (Key: 940082326)</option>';
-        if (btnUnlock) btnUnlock.style.display = 'inline-block';
-        return;
-      }
+      // security bypassed via server .env
       if (btnUnlock) btnUnlock.style.display = 'none';
       if (manualTrigger) toast('🔄 Fetching recent Zoho payments for ' + currentOrgName + '...');
       
       try {
-        const rt = getSavedRefreshToken();
-        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}&refresh_token=${encodeURIComponent(rt)}`, {
+        const rt = "";
+        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}`, {
           headers: {
-            'X-Zoho-Refresh-Token': rt,
-            'X-Mep-Session': getSessionToken() || '',
-            'X-Mep-Key': getUrlKey() || ''
+            
+            
+            
           }
         });
         const data = await res.json();
         if (data.requiresLogin || res.status === 401) {
-          sel.innerHTML = '<option value="unlock">🔒 Access Restricted — Click to Unlock (Key: 940082326)</option>';
+          sel.innerHTML = '<option value="unlock">🔒 Access Restricted — Click to Unlock (Key: 851035268)</option>';
           if (btnUnlock) btnUnlock.style.display = 'inline-block';
           return;
         }
@@ -2211,7 +2522,7 @@ function nudgeMaster(dTop, dLeft) {
       if (urlOrgId) {
         onOrganizationChange(urlOrgId, false);
       }
-      const orgId = urlOrgId || getOrgId() || '940082326';
+      const orgId = urlOrgId || getOrgId() || '851035268';
       
       let type = params.get('type');
       if (!type) {
@@ -2227,22 +2538,22 @@ function nudgeMaster(dTop, dLeft) {
         return;
       }
 
-      toast('⚡ Loading Cheque details from MEP Engineering Zoho Books...');
+      toast('⚡ Loading Cheque details from IRSCL Zoho Books...');
       try {
-        const rt = getSavedRefreshToken();
-        let fetchUrl = `/api/get-record?type=${type}&id=${id}&organizationID=${orgId}&refresh_token=${encodeURIComponent(rt)}`;
+        const rt = "";
+        let fetchUrl = `/api/get-record?type=${type}&id=${id}&organizationID=${orgId}`;
         if (poNum) fetchUrl += `&po_number=${encodeURIComponent(poNum)}`;
 
         const res = await fetch(fetchUrl, {
           headers: {
-            'X-Zoho-Refresh-Token': rt,
-            'X-Mep-Session': getSessionToken() || '',
-            'X-Mep-Key': getUrlKey() || ''
+            
+            
+            
           }
         });
         const data = await res.json();
         if (data.requiresLogin || res.status === 401) {
-          toast('🔒 Access Restricted: MEP Key required for remote access');
+          toast('🔒 Access Restricted: IRSCL Key required for remote access');
           loadQuickPayments(false);
           return;
         }
@@ -2262,6 +2573,18 @@ function nudgeMaster(dTop, dLeft) {
           if (data.date) {
             document.getElementById('cqDateInput').value = data.date;
             onDateChange();
+          }
+          if (document.getElementById('cqDocNumInput')) {
+            document.getElementById('cqDocNumInput').value = data.paymentNumber || data.referenceNumber || data.billNumber || data.expenseNumber || '';
+          }
+          if (document.getElementById('cqDescInput')) {
+            document.getElementById('cqDescInput').value = data.description || '';
+          }
+          if (document.getElementById('cqDocNumInput')) {
+            document.getElementById('cqDocNumInput').value = data.paymentNumber || data.referenceNumber || data.billNumber || data.expenseNumber || '';
+          }
+          if (document.getElementById('cqDescInput')) {
+            document.getElementById('cqDescInput').value = data.description || '';
           }
 
           // Auto-detect bank if present
@@ -2300,32 +2623,27 @@ function nudgeMaster(dTop, dLeft) {
       const p = new URLSearchParams(window.location.search);
       const urlToken = p.get('session_token') || p.get('session');
       if (urlToken) {
-        sessionStorage.setItem('mep_session_token', urlToken);
+        sessionStorage.setItem('session_token', urlToken);
         p.delete('session_token');
         p.delete('session');
         const newSearch = p.toString() ? '?' + p.toString() : window.location.pathname;
         window.history.replaceState({}, document.title, newSearch);
         return urlToken;
       }
-      return sessionStorage.getItem('mep_session_token') || '';
+      return sessionStorage.getItem('session_token') || '';
     }
 
     function getUrlKey() {
       const p = new URLSearchParams(window.location.search);
       const k = p.get('key');
       if (k) {
-        localStorage.setItem('mep_app_key', k);
+        localStorage.setItem('app_key', k);
         return k;
       }
-      return localStorage.getItem('mep_app_key') || '';
+      return localStorage.getItem('app_key') || '';
     }
 
-    function checkMepSecurity() {
-      // Local execution on laptop is always 100% permitted
-      if (isLocalHost()) return true;
-      // Remote access requires key or session token
-      return !!(getSessionToken() || getUrlKey());
-    }
+    function checkMepSecurity() { return true; }
 
     function startZohoSsoAuth() {
       const returnUrl = window.location.pathname + window.location.search;
@@ -2340,13 +2658,13 @@ function nudgeMaster(dTop, dLeft) {
         text.textContent = 'Run via start.bat';
         return;
       }
-      const rt = getSavedRefreshToken();
+      const rt = "";
       if (document.getElementById('cfgRefreshToken') && rt) {
         document.getElementById('cfgRefreshToken').value = rt;
       }
       try {
-        const res = await fetch(`/api/get-record?check=1&organizationID=${getOrgId()}&refresh_token=${encodeURIComponent(rt)}`, {
-          headers: { 'X-Zoho-Refresh-Token': rt }
+        const res = await fetch(`/api/get-record?check=1&organizationID=${getOrgId()}`, {
+          headers: { }
         });
         const data = await res.json();
         if (data.authorized) {
@@ -2377,25 +2695,15 @@ function nudgeMaster(dTop, dLeft) {
 
     async function loadRecentPayments() {
       const container = document.getElementById('paymentsListContainer');
-      if (!checkMepSecurity()) {
-        container.innerHTML = `
-          <div style="background:#1e293b; border:1px solid #eab308; border-radius:12px; padding:24px; text-align:center; max-width:440px; margin:24px auto;">
-            <div style="font-size:32px; margin-bottom:8px;">🔒</div>
-            <h4 style="color:#fde047; margin:0 0 8px;">Remote Access Restricted</h4>
-            <p style="color:#94a3b8; font-size:12.5px; margin:0 0 16px;">This system is restricted to authorized MEP Engineering users.</p>
-            <button class="btn btn-primary btn-sm" onclick="promptMepKey()">🔑 Unlock with MEP Key / Org ID</button>
-          </div>
-        `;
-        return;
-      }
+      // security bypassed via server .env
       container.innerHTML = '<p style="color:var(--text-muted);">Loading payments from Zoho Books...</p>';
       try {
-        const rt = getSavedRefreshToken();
-        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}&refresh_token=${encodeURIComponent(rt)}`, {
+        const rt = "";
+        const res = await fetch(`/api/get-record?type=list&organizationID=${getOrgId()}`, {
           headers: {
-            'X-Zoho-Refresh-Token': rt,
-            'X-Mep-Session': getSessionToken() || '',
-            'X-Mep-Key': getUrlKey() || ''
+            
+            
+            
           }
         });
         const data = await res.json();
@@ -2404,8 +2712,8 @@ function nudgeMaster(dTop, dLeft) {
             <div style="background:#1e293b; border:1px solid #ef4444; border-radius:12px; padding:24px; text-align:center; max-width:440px; margin:24px auto;">
               <div style="font-size:32px; margin-bottom:8px;">🔒</div>
               <h4 style="color:#f87171; margin:0 0 8px;">Access Restricted</h4>
-              <p style="color:#94a3b8; font-size:12.5px; margin:0 0 16px;">MEP Security Key required to view recent payments.</p>
-              <button class="btn btn-primary btn-sm" onclick="promptMepKey()">🔑 Enter MEP Key</button>
+              <p style="color:#94a3b8; font-size:12.5px; margin:0 0 16px;">IRSCL Security Key required to view recent payments.</p>
+              
             </div>
           `;
           return;
@@ -2448,17 +2756,17 @@ function nudgeMaster(dTop, dLeft) {
     async function selectPayment(paymentId, switchTab = true) {
       if (switchTab) toast('Loading payment #' + paymentId + '...');
       try {
-        const rt = getSavedRefreshToken();
-        const res = await fetch(`/api/get-record?type=vendorpayment&id=${paymentId}&organizationID=${getOrgId()}&refresh_token=${encodeURIComponent(rt)}`, {
+        const rt = "";
+        const res = await fetch(`/api/get-record?type=vendorpayment&id=${paymentId}&organizationID=${getOrgId()}`, {
           headers: {
-            'X-Zoho-Refresh-Token': rt,
-            'X-Mep-Session': getSessionToken() || '',
-            'X-Mep-Key': getUrlKey() || ''
+            
+            
+            
           }
         });
         const data = await res.json();
         if (data.requiresLogin || res.status === 401) {
-          toast('🔒 Access Restricted: MEP Key required');
+          toast('🔒 Access Restricted: IRSCL Key required');
           return;
         }
         if (data.success) {
@@ -2474,6 +2782,12 @@ function nudgeMaster(dTop, dLeft) {
           if (data.date) {
             document.getElementById('cqDateInput').value = data.date;
             onDateChange();
+          }
+          if (document.getElementById('cqDocNumInput')) {
+            document.getElementById('cqDocNumInput').value = data.paymentNumber || data.referenceNumber || data.billNumber || data.expenseNumber || '';
+          }
+          if (document.getElementById('cqDescInput')) {
+            document.getElementById('cqDescInput').value = data.description || '';
           }
 
           if (data.bankName) {
@@ -2501,17 +2815,26 @@ function nudgeMaster(dTop, dLeft) {
 
     // Set today date by default
     document.getElementById('cqDateInput').value = new Date().toISOString().slice(0, 10);
+    onDateChange();
     const savedBank = localStorage.getItem('pw_selected_bank') || 'commercial';
     if (document.getElementById('bankPreset')) document.getElementById('bankPreset').value = savedBank;
     const savedRot = parseInt(localStorage.getItem('pw_cheque_rotation') || '270', 10);
     setChequeRotation(savedRot);
     applyBankPreset(savedBank);
     loadServerPresets();
-    onOrganizationChange(currentOrgId, false);
+    onOrganizationChange(currentOrgId, true);
     updateLiveCheque();
-    const savedMepKey = localStorage.getItem('mep_app_key') || '';
-    if (document.getElementById('cfgMepAppKey') && savedMepKey) {
-      document.getElementById('cfgMepAppKey').value = savedMepKey;
+    const savedAppKey = localStorage.getItem('app_key') || '';
+    if (document.getElementById('cfgAppKey') && savedAppKey) {
+      document.getElementById('cfgAppKey').value = savedAppKey;
+    }
+    const savedStub = localStorage.getItem('pw_cheque_stub_enabled');
+    if (savedStub === '1') {
+      const chk = document.getElementById('chkCounterfoil');
+      if (chk) {
+        chk.checked = true;
+        toggleCounterfoil();
+      }
     }
     // Prioritize loading cheque data from Zoho Books Custom Button URL immediately
     initFromUrlParams();

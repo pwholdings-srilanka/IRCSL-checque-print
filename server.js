@@ -77,6 +77,7 @@ const server = http.createServer(async (req, res) => {
   res.writeHead(200, {
     'Content-Type': mimeTypes[ext] || 'application/octet-stream',
     'X-Content-Type-Options': 'nosniff',
+    'Cache-Control': 'no-cache, no-store, must-revalidate',
   });
   fs.createReadStream(filePath).pipe(res);
 });
