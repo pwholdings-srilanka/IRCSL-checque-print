@@ -1,5 +1,5 @@
 ---
 deployment:
   tasks:
-    - export DEPLOYPATH=/home/pwholdin/cheque.pwholdings.lk
+    - export DEPLOYPATH=/home/pwholdin/ircsl-cheque.pwholdings.lk
     - /bin/cp -r * $DEPLOYPATH
