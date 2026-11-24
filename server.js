@@ -100,15 +100,13 @@ const server = http.createServer(async (req, res) => {
   fs.createReadStream(filePath).pipe(res);
 });
 
-const PORT = Number(process.env.PORT) || 8888;
-if (require.main === module) {
-  server.listen(PORT, '0.0.0.0', () => {
-    console.log(`====================================================`);
-    console.log(` PW Holdings Cheque Printer Running at:`);
-    console.log(` http://localhost:${PORT}`);
-    console.log(`====================================================`);
-  });
-}
+const PORT = process.env.PORT || 8888;
+server.listen(PORT, () => {
+  console.log(`====================================================`);
+  console.log(` PW Holdings Cheque Printer Running at:`);
+  console.log(` http://localhost:${PORT}`);
+  console.log(`====================================================`);
+});
 
 module.exports = server;
 
